@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 # from models.message import Message
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Ou spécifie l'URL de Ngrok si besoin
 
 # Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] ='sqlite:///chat.db'
