@@ -204,8 +204,8 @@ def update_profile():
         user.profile_picture = data['profile_picture']  # Le chemin de l'image
     
     # Mettre à jour le mot de passe (en le hachant)
-    if 'password' in data:
-        user.password = generate_password_hash(data['password'])
+    # if 'password' in data:
+        # user.password = generate_password_hash(data['password'])
 
     db.session.commit()
     return jsonify({'message': 'Profile updated successfully'}), 200
