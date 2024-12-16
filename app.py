@@ -158,6 +158,41 @@ def add_relation():
         db.session.rollback()  # Annuler la transaction en cas d'erreur
         return jsonify({'message': f'Erreur serveur: {str(e)}'}), 500
 
+# Ajoutez cette route à votre fichier d'API Flask
+
+@app.route('/profile/delete', methods=['POST'])
+def delete_profile():
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({'error': 'Utilisateur non trouvé'}), 404
+
+        # Supprimer les relations de l'utilisateur
+        UserRelation.query.filter(
+            (UserRelation.user1 == user_id) | (UserRelation.user2 == user_id)
+        ).delete()
+
+        # Supprimer les messages de l'utilisateur
+        Message.query.filter(
+            (Message.sender_id == user_id) | (Message.receiver_id == user_id)
+        ).delete()
+
+        # Supprimer la photo de profil si elle existe
+        if user.profile_picture and os.path.exists(user.profile_picture):
+            os.remove(user.profile_picture)
+
+        # Supprimer l'utilisateur
+        db.session.delete(user)
+        db.session.commit()
+
+        return jsonify({'message': 'Compte supprimé avec succès'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erreur lors de la suppression : {str(e)}'}), 500
 
 # Route pour envoyer un message
 @app.route('/messages/send', methods=['POST'])
